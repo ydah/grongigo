@@ -1,0 +1,157 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/grongigo'
+require 'optparse'
+
+# Set standard I/O encoding to UTF-8
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
+options = {
+  verbose: false,
+  output_tokens: false,
+  output_ast: false,
+  output: nil,
+  run: false,
+  convert: false
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Grongigo - Grongigo Programming Language Compiler
+
+    Usage: #{$PROGRAM_NAME} [options] <source_file.grg>
+
+    Compiles programs written in Grongi language to C.
+
+  BANNER
+
+  opts.on('-o', '--output FILE', 'Output file name') do |file|
+    options[:output] = file
+  end
+
+  opts.on('-v', '--verbose', 'Verbose output') do
+    options[:verbose] = true
+  end
+
+  opts.on('-t', '--tokens', 'Output tokens') do
+    options[:output_tokens] = true
+  end
+
+  opts.on('-a', '--ast', 'Output AST') do
+    options[:output_ast] = true
+  end
+
+  opts.on('-r', '--run', 'Compile and run (requires gcc)') do
+    options[:run] = true
+  end
+
+  opts.on('-c', '--convert TEXT', 'Convert Japanese text to Grongigo') do |text|
+    options[:convert] = text
+  end
+
+  opts.on('-n', '--number NUM', Integer, 'Convert number to Grongigo (9-base)') do |num|
+    puts "#{num} (decimal) = #{Grongigo::Jp2Grg.num2grg(num)} (Grongigo)"
+    exit
+  end
+
+  opts.on('-h', '--help', 'Show this help') do
+    puts opts
+    exit
+  end
+
+  opts.on('--version', 'Show version') do
+    puts "Grongigo version #{Grongigo::VERSION}"
+    exit
+  end
+end
+
+parser.parse!
+
+# Japanese conversion mode
+if options[:convert]
+  puts Grongigo::Jp2Grg.convert(options[:convert])
+  exit
+end
+
+# If no source file is specified
+if ARGV.empty?
+  # Display sample program
+  puts parser
+  puts <<~SAMPLE
+
+    === Sample program (Hello World) ===
+
+    パザ ゲギグウ ゴロ バサ
+    ザジレ
+        ジョウジ（「リントンボドバ」）
+        ロゾス ゼゼソ
+    ゴパシ
+
+    === Keywords Reference ===
+
+    Types:
+      ゲギグウ (int)    ロジ (char)    ズゾウ (float)    バサ (void)
+
+    Control:
+      ジョウベン (if)   ゾバ (else)    ガギザ (while)   ブシバゲギ (for)
+      ロゾス (return)   ブゲス (break) ヅヅゲス (continue)
+      ゲンダブ (switch) ダガギ (case)  ビデギ (default)
+
+    Operators:
+      ダグ (+)   ジブ (-)   バゲス (*)   パス (/)    ガラシ (%)
+      ギセス (=) ジドギギ (==) ジドギグバギ (!=)
+      ギョウバシ (<)  ザギバシ (>)  ギバ (<=)  ギジョウ (>=)
+      バヅ (&&)  ラダパ (||)  ジデギ (!)
+
+    Numbers (base-9):
+      ゼゼソ (0)   パパン (1)   ドググ (2)   グシギ (3)
+      ズゴゴ (4)   ズガギ (5)   ギブグ (6)   ゲズン (7)   ゲギド (8)
+      バギン (9)
+    #{'  '}
+      Addition: ド    Multiplication: グ
+      Example: バギンドパパン = 9 + 1 = 10
+
+    Syntax:
+      ザジレ ... ゴパシ  ({ ... })
+      パザ               (function definition marker)
+      「文字列」         (string literal)
+      『文字』           (character literal)
+      （ ）              (parentheses)
+      、                 (comma)
+      。                 (semicolon)
+
+  SAMPLE
+  exit
+end
+
+# Execute compilation
+input_file = ARGV[0]
+unless File.exist?(input_file)
+  puts "Error: File not found: #{input_file}"
+  exit 1
+end
+
+compiler = Grongigo::Compiler.new(options)
+output_file = options[:output] || input_file.sub(/\.[^.]+$/, '.c')
+
+if compiler.compile_file(input_file, output_file)
+  puts "Successfully compiled: #{input_file} -> #{output_file}"
+
+  if options[:run]
+    exe_file = output_file.sub(/\.c$/, '')
+    system("gcc -o #{exe_file} #{output_file}")
+    if $?.success?
+      puts "\n=== Running program ===\n"
+      system("./#{exe_file}")
+    else
+      puts 'Error: gcc compilation failed'
+      exit 1
+    end
+  end
+else
+  puts 'Compilation failed:'
+  compiler.errors.each { |e| puts "  #{e}" }
+  exit 1
+end
