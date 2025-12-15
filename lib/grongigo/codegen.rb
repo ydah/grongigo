@@ -240,6 +240,35 @@ module Grongigo
       end
     end
 
+    def generate_call_expr(node)
+      callee_name = node.callee.is_a?(AST::Identifier) ? node.callee.name : nil
+      is_printf = callee_name == 'printf' || callee_name == 'ジョウジ'
+
+      # For printf, automatically add \n to string literals if not present
+      if is_printf && !node.arguments.empty? && node.arguments[0].is_a?(AST::StringLiteral)
+        first_arg = node.arguments[0]
+        str_value = first_arg.value
+
+        # Add \n if not already present
+        unless str_value.end_with?("\\n") || str_value.end_with?("\n")
+          str_value += "\\n"
+        end
+
+        # Generate modified first argument
+        modified_first = "\"#{escape_string(str_value)}\""
+
+        # Generate remaining arguments
+        remaining_args = node.arguments[1..].map { |a| generate_expr(a) }
+
+        all_args = [modified_first] + remaining_args
+        "#{generate_expr(node.callee)}(#{all_args.join(', ')})"
+      else
+        # Normal function call
+        args = node.arguments.map { |a| generate_expr(a) }.join(', ')
+        "#{generate_expr(node.callee)}(#{args})"
+      end
+    end
+
     def generate_expr(node)
       case node
       when AST::BinaryExpr
@@ -253,8 +282,7 @@ module Grongigo
       when AST::AssignExpr
         "#{generate_expr(node.target)} = #{generate_expr(node.value)}"
       when AST::CallExpr
-        args = node.arguments.map { |a| generate_expr(a) }.join(', ')
-        "#{generate_expr(node.callee)}(#{args})"
+        generate_call_expr(node)
       when AST::IndexExpr
         "#{generate_expr(node.array)}[#{generate_expr(node.index)}]"
       when AST::Identifier

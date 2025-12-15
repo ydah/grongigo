@@ -85,7 +85,7 @@ if ARGV.empty?
 
     パザ ゲギグウ ゴロ バサ
     ザジレ
-        ジョウジ（「リントンボドバ」）
+        ジョウジ ザジレジョヂザギ「リントンボドバ」ゴパシジョヂザギ
         ロゾス ゼゼソ
     ゴパシ
 
@@ -114,13 +114,14 @@ if ARGV.empty?
       Example: バギンドパパン = 9 + 1 = 10
 
     Syntax:
-      ザジレ ... ゴパシ  ({ ... })
-      パザ               (function definition marker)
-      「文字列」         (string literal)
-      『文字』           (character literal)
-      （ ）              (parentheses)
-      、                 (comma)
-      。                 (semicolon)
+      ザジレ ... ゴパシ                      ({ ... })
+      パザ                                   (function definition marker)
+      「文字列」                             (string literal)
+      『文字』                               (character literal)
+      ザジレジョヂザギ ... ゴパシジョヂザギ  (method call brackets)
+      ザジレパギセヅ ... ゴパシザギセヅ      (array access brackets)
+      、                                     (comma)
+      。                                     (semicolon)
 
   SAMPLE
   exit

@@ -180,7 +180,7 @@ RSpec.describe Grongigo::Lexer do
       end
 
       it 'tokenizes parentheses' do
-        lexer = described_class.new('（）')
+        lexer = described_class.new('ザジレジョヂザギ ゴパシジョヂザギ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:open_paren)
@@ -189,16 +189,8 @@ RSpec.describe Grongigo::Lexer do
         expect(tokens[1].value).to eq(')')
       end
 
-      it 'tokenizes ASCII parentheses' do
-        lexer = described_class.new('()')
-        tokens = lexer.tokenize
-
-        expect(tokens[0].type).to eq(:open_paren)
-        expect(tokens[1].type).to eq(:close_paren)
-      end
-
       it 'tokenizes brackets' do
-        lexer = described_class.new('［］')
+        lexer = described_class.new('ザジレパギセヅ ゴパシザギセヅ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:open_bracket)

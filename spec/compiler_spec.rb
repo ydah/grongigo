@@ -27,7 +27,7 @@ RSpec.describe Grongigo::Compiler do
       it 'compiles a function with printf' do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
-            printf(「Hello, World!」)
+            printf ザジレジョヂザギ「Hello, World!」ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -35,7 +35,7 @@ RSpec.describe Grongigo::Compiler do
         compiler = described_class.new
         c_code = compiler.compile(source)
 
-        expect(c_code).to include('printf("Hello, World!");')
+        expect(c_code).to include('printf("Hello, World!\\n");')
         expect(compiler.errors).to be_empty
       end
 
@@ -65,9 +65,9 @@ RSpec.describe Grongigo::Compiler do
           パザ ゲギグウ ゴロ バサ ザジレ
             ゲギグウ x ギセス パパン
             ジョウベン x ザジレ
-              printf(「x is true」)
+              printf ザジレジョヂザギ「x is true」ゴパシジョヂザギ
             ゴパシ ゾバ ザジレ
-              printf(「x is false」)
+              printf ザジレジョヂザギ「x is false」ゴパシジョヂザギ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -103,8 +103,8 @@ RSpec.describe Grongigo::Compiler do
       it 'compiles for loops' do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
-            ブシバゲギ (ゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ) ザジレ
-              printf(「%d」、i)
+            ブシバゲギ ザジレジョヂザギゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ ゴパシジョヂザギ ザジレ
+              printf ザジレジョヂザギ「%d」、i ゴパシジョヂザギ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -130,9 +130,9 @@ RSpec.describe Grongigo::Compiler do
           ゴパシ
 
           パザ ゲギグウ ゴロ バサ ザジレ
-            ゲギグウ result1 ギセス add(グシギ、ズゴゴ)
-            ゲギグウ result2 ギセス multiply(ドググ、グシギ)
-            printf(「%d %d」、result1、result2)
+            ゲギグウ result1 ギセス add ザジレジョヂザギグシギ、ズゴゴ ゴパシジョヂザギ
+            ゲギグウ result2 ギセス multiply ザジレジョヂザギドググ、グシギ ゴパシジョヂザギ
+            printf ザジレジョヂザギ「%d %d」、result1、result2 ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -168,7 +168,7 @@ RSpec.describe Grongigo::Compiler do
           パザ ゲギグウ ゴロ バサ ザジレ
             ゲギグウ x ギセス パパン
             ジョウベン x ジドギギ パパン ザジレ
-              printf(「equal」)
+              printf ザジレジョヂザギ「equal」ゴパシジョヂザギ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -187,7 +187,7 @@ RSpec.describe Grongigo::Compiler do
             ゲギグウ x ギセス パパン
             ゲギグウ y ギセス ドググ
             ジョウベン x ザギバシ ゼゼソ バヅ y ギョウバシ ゼゼソ ザジレ
-              printf(「both true」)
+              printf ザジレジョヂザギ「both true」ゴパシジョヂザギ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -304,12 +304,12 @@ RSpec.describe Grongigo::Compiler do
             ジョウベン n ギバ パパン ザジレ
               ロゾス n
             ゴパシ
-            ロゾス fib(n ジブ パパン) ダグ fib(n ジブ ドググ)
+            ロゾス fib ザジレジョヂザギn ジブ パパン ゴパシジョヂザギ ダグ fib ザジレジョヂザギn ジブ ドググ ゴパシジョヂザギ
           ゴパシ
 
           パザ ゲギグウ ゴロ バサ ザジレ
-            ゲギグウ result ギセス fib(バギン)
-            printf(「Fib(9) = %d」、result)
+            ゲギグウ result ギセス fib ザジレジョヂザギバギン ゴパシジョヂザギ
+            printf ザジレジョヂザギ「Fib(9) = %d」、result ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -330,12 +330,12 @@ RSpec.describe Grongigo::Compiler do
             ジョウベン n ギバ パパン ザジレ
               ロゾス パパン
             ゴパシ
-            ロゾス n バゲス factorial(n ジブ パパン)
+            ロゾス n バゲス factorial ザジレジョヂザギn ジブ パパン ゴパシジョヂザギ
           ゴパシ
 
           パザ ゲギグウ ゴロ バサ ザジレ
-            ゲギグウ result ギセス factorial(ズガギ)
-            printf(「5! = %d」、result)
+            ゲギグウ result ギセス factorial ザジレジョヂザギズガギ ゴパシジョヂザギ
+            printf ザジレジョヂザギ「5! = %d」、result ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -352,12 +352,12 @@ RSpec.describe Grongigo::Compiler do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
             ゲギグウ sum ギセス ゼゼソ
-            ブシバゲギ (ゲギグウ i ギセス パパン、i ギバ バギン、i ダグダグ) ザジレ
+            ブシバゲギ ザジレジョヂザギゲギグウ i ギセス パパン、i ギバ バギン、i ダグダグ ゴパシジョヂザギ ザジレ
               ジョウベン i ガラシ ドググ ジドギギ ゼゼソ ザジレ
                 sum ギセス sum ダグ i
               ゴパシ
             ゴパシ
-            printf(「Sum: %d」、sum)
+            printf ザジレジョヂザギ「Sum: %d」、sum ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO

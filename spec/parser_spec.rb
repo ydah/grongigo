@@ -41,17 +41,6 @@ RSpec.describe Grongigo::Parser do
         expect(func.params[1].name).to eq('ダ')
       end
 
-      it 'parses a function with parentheses' do
-        source = 'パザ ゲギグウ main(バサ) ザジレ ゴパシ'
-        tokens = tokenize(source)
-        parser = described_class.new(tokens)
-        ast = parser.parse
-
-        func = ast.declarations[0]
-        expect(func.return_type).to eq('int')
-        expect(func.name).to eq('main')
-        expect(func.params).to be_empty
-      end
     end
 
     context 'with variable declarations' do
@@ -144,7 +133,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses for statement' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ブシバゲギ (ゲギグウ ギ ギセス ゼゼソ、ギ ギョウバシ バギン、ギ ダグダグ) ザジレ
+            ブシバゲギ ザジレジョヂザギゲギグウ ギ ギセス ゼゼソ、ギ ギョウバシ バギン、ギ ダグダグ ゴパシジョヂザギ ザジレ
               ロゾス
             ゴパシ
           ゴパシ
@@ -257,7 +246,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses function call expressions' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ジョウジ(「デギド」)
+            ジョウジ ザジレジョヂザギ「デギド」ゴパシジョヂザギ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)
@@ -275,7 +264,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses array index expressions' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            バ ギセス ガラズ[ゼゼソ]
+            バ ギセス ガラズ ザジレパギセヅ ゼゼソ ゴパシザギセヅ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)
@@ -331,7 +320,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses string literals' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ジョウジ(「ゼソ」)
+            ジョウジ ザジレジョヂザギ「ゼソ」ゴパシジョヂザギ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)

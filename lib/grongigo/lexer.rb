@@ -126,18 +126,6 @@ module Grongigo
 
       # Brackets and delimiters
       case current_char
-      when '（', '('
-        advance
-        return Token.new(:open_paren, '(', start_line, start_column)
-      when '）', ')'
-        advance
-        return Token.new(:close_paren, ')', start_line, start_column)
-      when '［', '['
-        advance
-        return Token.new(:open_bracket, '[', start_line, start_column)
-      when '］', ']'
-        advance
-        return Token.new(:close_bracket, ']', start_line, start_column)
       when '、', ','
         advance
         return Token.new(:comma, ',', start_line, start_column)
@@ -199,9 +187,32 @@ module Grongigo
     end
 
     def classify_katakana_word(word)
-      # Block delimiters
-      return [:open_brace, '{'] if word == 'ザジレ'
-      return [:close_brace, '}'] if word == 'ゴパシ'
+      # Check if word starts with a special keyword and split if necessary
+      # This handles cases like 'ザジレジョヂザギゲギグウ' -> 'ザジレジョヂザギ' + 'ゲギグウ'
+      special_keywords = {
+        'ザジレジョヂザギ' => [:open_paren, '('],
+        'ゴパシジョヂザギ' => [:close_paren, ')'],
+        'ザジレパギセヅ' => [:open_bracket, '['],
+        'ゴパシザギセヅ' => [:close_bracket, ']'],
+        'ザジレ' => [:open_brace, '{'],
+        'ゴパシ' => [:close_brace, '}']
+      }
+
+      # Sort by length (longest first) to match longer keywords first
+      special_keywords.keys.sort_by { |k| -k.length }.each do |keyword|
+        if word.start_with?(keyword)
+          # If word is longer than keyword, rewind position
+          if word.length > keyword.length
+            excess = word.length - keyword.length
+            @pos -= excess
+            @column -= excess
+          end
+          return special_keywords[keyword]
+        end
+      end
+
+      # Exact match for special keywords (backward compatibility)
+      return special_keywords[word] if special_keywords.key?(word)
 
       # Type keywords
       return [:type_keyword, TYPE_KEYWORDS[word]] if TYPE_KEYWORDS.key?(word)

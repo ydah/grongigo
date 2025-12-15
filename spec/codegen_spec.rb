@@ -145,8 +145,8 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates for loop' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            ブシバゲギ (ゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ) ザジレ
-              printf(「test」)
+            ブシバゲギ ザジレジョヂザギゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ ゴパシジョヂザギ ザジレ
+              printf ザジレジョヂザギ「test」ゴパシジョヂザギ
             ゴパシ
           ゴパシ
         GRONGIGO
@@ -155,7 +155,7 @@ RSpec.describe Grongigo::CodeGenerator do
         c_code = generator.generate(ast)
 
         expect(c_code).to include('for (int i = 0; (i < 9); i++)')
-        expect(c_code).to include('printf("test");')
+        expect(c_code).to include('printf("test\\n");')
       end
     end
 
@@ -202,20 +202,20 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates function call expressions' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            printf(「Hello」、x)
+            printf ザジレジョヂザギ「Hello」、x ゴパシジョヂザギ
           ゴパシ
         GRONGIGO
         ast = parse(source)
         generator = described_class.new
         c_code = generator.generate(ast)
 
-        expect(c_code).to include('printf("Hello", x);')
+        expect(c_code).to include('printf("Hello\\n", x);')
       end
 
       it 'generates array access expressions' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            ゲギグウ x ギセス arr[ゼゼソ]
+            ゲギグウ x ギセス arr ザジレパギセヅ ゼゼソ ゴパシザギセヅ
           ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -269,21 +269,21 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates string literals' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            printf(「Hello, World!」)
+            printf ザジレジョヂザギ「Hello, World!」ゴパシジョヂザギ
           ゴパシ
         GRONGIGO
         ast = parse(source)
         generator = described_class.new
         c_code = generator.generate(ast)
 
-        expect(c_code).to include('printf("Hello, World!");')
+        expect(c_code).to include('printf("Hello, World!\\n");')
       end
 
       it 'escapes special characters in strings' do
         source = <<~GRONGIGO
                     パザ バサ test バサ ザジレ
-                      printf(「Line1
-          Line2」)
+                      printf ザジレジョヂザギ「Line1
+          Line2」ゴパシジョヂザギ
                     ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -338,7 +338,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'preserves standard C function names' do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
-            printf(「test」)
+            printf ザジレジョヂザギ「test」ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -359,8 +359,8 @@ RSpec.describe Grongigo::CodeGenerator do
           ゴパシ
 
           パザ ゲギグウ ゴロ バサ ザジレ
-            ゲギグウ result ギセス add(グシギ、ズゴゴ)
-            printf(「Result: %d」、result)
+            ゲギグウ result ギセス add ザジレジョヂザギグシギ、ズゴゴ ゴパシジョヂザギ
+            printf ザジレジョヂザギ「Result: %d」、result ゴパシジョヂザギ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -372,14 +372,14 @@ RSpec.describe Grongigo::CodeGenerator do
         expect(c_code).to include('return (a + b);')
         expect(c_code).to include('int main(void)')
         expect(c_code).to include('int result = add(3, 4);')
-        expect(c_code).to include('printf("Result: %d", result);')
+        expect(c_code).to include('printf("Result: %d\\n", result);')
       end
 
       it 'generates proper indentation' do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
             ジョウベン パパン ザジレ
-              printf(「nested」)
+              printf ザジレジョヂザギ「nested」ゴパシジョヂザギ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -411,7 +411,7 @@ RSpec.describe Grongigo::CodeGenerator do
           パザ バサ test バサ ザジレ
             ザジレ
               ザジレ
-                printf(「deep」)
+                printf ザジレジョヂザギ「deep」ゴパシジョヂザギ
               ゴパシ
             ゴパシ
           ゴパシ
@@ -420,7 +420,7 @@ RSpec.describe Grongigo::CodeGenerator do
         generator = described_class.new
         c_code = generator.generate(ast)
 
-        expect(c_code).to include('printf("deep");')
+        expect(c_code).to include('printf("deep\\n");')
         expect(c_code.scan('{').length).to eq(c_code.scan('}').length)
       end
     end
