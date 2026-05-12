@@ -133,7 +133,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses for statement' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ブシバゲギ ザジレジョヂザギゲギグウ ギ ギセス ゼゼソ、ギ ギョウバシ バギン、ギ ダグダグ ゴパシジョヂザギ ザジレ
+            ブシバゲギ ジサビバッボゲギグウ ギ ギセス ゼゼソ、ギ ギョウバシ バギン、ギ ダグダグ ドジバッボ ザジレ
               ロゾス
             ゴパシ
           ゴパシ
@@ -246,7 +246,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses function call expressions' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ジョウジ ザジレジョヂザギ「デギド」ゴパシジョヂザギ
+            ジョウジジサビバッボジサビロジセヅデギドドジロジセヅドジバッボ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)
@@ -264,7 +264,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses array index expressions' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            バ ギセス ガラズ ザジレパギセヅ ゼゼソ ゴパシザギセヅ
+            バ ギセス ガラズ ジサビバブバッボ ゼゼソ ドジバブバッボ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)
@@ -303,6 +303,19 @@ RSpec.describe Grongigo::Parser do
         expect(binary_expr).to be_a(Grongigo::AST::BinaryExpr)
         expect(binary_expr.operator).to eq('&&')
       end
+
+      it 'parses bitwise expressions' do
+        source = 'ゲギグウ セギャスド ギセス バ ガンド ダ ゴガ ザ'
+        tokens = tokenize(source)
+        parser = described_class.new(tokens)
+        ast = parser.parse
+
+        var_decl = ast.declarations[0]
+        binary_expr = var_decl.initializer
+        expect(binary_expr).to be_a(Grongigo::AST::BinaryExpr)
+        expect(binary_expr.operator).to eq('|')
+        expect(binary_expr.left.operator).to eq('&')
+      end
     end
 
     context 'with literals' do
@@ -320,7 +333,7 @@ RSpec.describe Grongigo::Parser do
       it 'parses string literals' do
         source = <<~GRONGIGO
           パザ バサ デギド バサ ザジレ
-            ジョウジ ザジレジョヂザギ「ゼソ」ゴパシジョヂザギ
+            ジョウジ ジサビバッボジサビロジセヅゼソドジロジセヅドジバッボ
           ゴパシ
         GRONGIGO
         tokens = tokenize(source)
@@ -336,7 +349,7 @@ RSpec.describe Grongigo::Parser do
       end
 
       it 'parses char literals' do
-        source = 'ロジ ダ ギセス 『ガ』'
+        source = 'ロジ ダ ギセス ジサビジドロジガドジジドロジ'
         tokens = tokenize(source)
         parser = described_class.new(tokens)
         ast = parser.parse
@@ -344,6 +357,23 @@ RSpec.describe Grongigo::Parser do
         var_decl = ast.declarations[0]
         expect(var_decl.initializer).to be_a(Grongigo::AST::CharLiteral)
         expect(var_decl.initializer.value).to eq('ガ')
+      end
+
+      it 'parses boolean and null literal keywords' do
+        source = <<~GRONGIGO
+          ゲギグウ バ ギセス ビゲ
+          ロジ ポインタ ギセス ルヂ
+        GRONGIGO
+        tokens = tokenize(source)
+        parser = described_class.new(tokens)
+        ast = parser.parse
+
+        false_decl = ast.declarations[0]
+        null_decl = ast.declarations[1]
+        expect(false_decl.initializer).to be_a(Grongigo::AST::NumberLiteral)
+        expect(false_decl.initializer.value).to eq(0)
+        expect(null_decl.initializer).to be_a(Grongigo::AST::Identifier)
+        expect(null_decl.initializer.name).to eq('NULL')
       end
     end
 

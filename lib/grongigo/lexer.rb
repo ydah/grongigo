@@ -10,6 +10,8 @@ module Grongigo
     TOKEN_TYPES = %i[
       type_keyword
       control_keyword
+      builtin_keyword
+      literal_keyword
       other_keyword
       operator
       number
@@ -27,6 +29,29 @@ module Grongigo
       colon
       newline
       eof
+    ].freeze
+
+    STRING_LITERAL_OPEN = 'ジサビロジセヅ'
+    STRING_LITERAL_CLOSE = 'ドジロジセヅ'
+    CHAR_LITERAL_OPEN = 'ジサビジドロジ'
+    CHAR_LITERAL_CLOSE = 'ドジジドロジ'
+
+    SYNTAX_KEYWORDS = {
+      'ジサビバッボ' => [:open_paren, '('],
+      'ドジバッボ' => [:close_paren, ')'],
+      'ジサビバブバッボ' => [:open_bracket, '['],
+      'ドジバブバッボ' => [:close_bracket, ']'],
+      'ザジレ' => [:open_brace, '{'],
+      'ゴパシ' => [:close_brace, '}']
+    }.freeze
+
+    RESERVED_KEYWORD_GROUPS = [
+      [TYPE_KEYWORDS, :type_keyword],
+      [CONTROL_KEYWORDS, :control_keyword],
+      [BUILTIN_KEYWORDS, :builtin_keyword],
+      [LITERAL_KEYWORDS, :literal_keyword],
+      [OTHER_KEYWORDS, :other_keyword],
+      [OPERATORS, :operator]
     ].freeze
 
     def initialize(source)
@@ -89,7 +114,6 @@ module Grongigo
           next
         end
 
-        # Comment: ゴレン to end of line (custom definition for comments)
         # Simple line comment starting with "ゴゴ" (equivalent to //)
         if peek(2) == 'ゴゴ'
           advance(2)
@@ -118,11 +142,15 @@ module Grongigo
       start_line = @line
       start_column = @column
 
-      # String literal 「」
-      return scan_string_literal(start_line, start_column) if current_char == '「'
+      # String literal
+      if peek(STRING_LITERAL_OPEN.length) == STRING_LITERAL_OPEN
+        return scan_string_literal(start_line, start_column)
+      end
 
-      # Character literal 『』
-      return scan_char_literal(start_line, start_column) if current_char == '『'
+      # Character literal
+      if peek(CHAR_LITERAL_OPEN.length) == CHAR_LITERAL_OPEN
+        return scan_char_literal(start_line, start_column)
+      end
 
       # Brackets and delimiters
       case current_char
@@ -153,25 +181,34 @@ module Grongigo
     end
 
     def scan_string_literal(start_line, start_column)
-      advance # Skip opening 「
-      value = ''
-      until eof? || current_char == '」'
-        value += current_char
-        advance
-      end
-      advance if current_char == '」' # Skip closing 」
-      Token.new(:string_literal, value, start_line, start_column)
+      scan_delimited_literal(
+        start_line,
+        start_column,
+        STRING_LITERAL_OPEN,
+        STRING_LITERAL_CLOSE,
+        :string_literal
+      )
     end
 
     def scan_char_literal(start_line, start_column)
-      advance # Skip opening 『
+      scan_delimited_literal(
+        start_line,
+        start_column,
+        CHAR_LITERAL_OPEN,
+        CHAR_LITERAL_CLOSE,
+        :char_literal
+      )
+    end
+
+    def scan_delimited_literal(start_line, start_column, opening, closing, token_type)
+      advance(opening.length)
       value = ''
-      until eof? || current_char == '』'
+      until eof? || peek(closing.length) == closing
         value += current_char
         advance
       end
-      advance if current_char == '』' # Skip closing 』
-      Token.new(:char_literal, value, start_line, start_column)
+      advance(closing.length) if peek(closing.length) == closing
+      Token.new(token_type, value, start_line, start_column)
     end
 
     def scan_katakana_word(start_line, start_column)
@@ -187,38 +224,25 @@ module Grongigo
     end
 
     def classify_katakana_word(word)
-      # Check if word starts with a special keyword and split if necessary
-      # This handles cases like 'ザジレジョヂザギゲギグウ' -> 'ザジレジョヂザギ' + 'ゲギグウ'
-      special_keywords = {
-        'ザジレジョヂザギ' => [:open_paren, '('],
-        'ゴパシジョヂザギ' => [:close_paren, ')'],
-        'ザジレパギセヅ' => [:open_bracket, '['],
-        'ゴパシザギセヅ' => [:close_bracket, ']'],
-        'ザジレ' => [:open_brace, '{'],
-        'ゴパシ' => [:close_brace, '}']
-      }
+      # Split syntax delimiters from the following token when there is no whitespace.
+      syntax_token = match_prefixed_token(word, SYNTAX_KEYWORDS)
+      return syntax_token if syntax_token
 
-      # Sort by length (longest first) to match longer keywords first
-      special_keywords.keys.sort_by { |k| -k.length }.each do |keyword|
-        if word.start_with?(keyword)
-          # If word is longer than keyword, rewind position
-          if word.length > keyword.length
-            excess = word.length - keyword.length
-            @pos -= excess
-            @column -= excess
-          end
-          return special_keywords[keyword]
-        end
-      end
-
-      # Exact match for special keywords (backward compatibility)
-      return special_keywords[word] if special_keywords.key?(word)
+      # Split reserved words before syntax delimiters, e.g. ジョウジジサビバッボ.
+      reserved_token = match_reserved_prefix_before_syntax(word)
+      return reserved_token if reserved_token
 
       # Type keywords
       return [:type_keyword, TYPE_KEYWORDS[word]] if TYPE_KEYWORDS.key?(word)
 
       # Control keywords
       return [:control_keyword, CONTROL_KEYWORDS[word]] if CONTROL_KEYWORDS.key?(word)
+
+      # Built-in keywords
+      return [:builtin_keyword, BUILTIN_KEYWORDS[word]] if BUILTIN_KEYWORDS.key?(word)
+
+      # Literal keywords
+      return [:literal_keyword, LITERAL_KEYWORDS[word]] if LITERAL_KEYWORDS.key?(word)
 
       # Other keywords
       if OTHER_KEYWORDS.key?(word)
@@ -235,6 +259,49 @@ module Grongigo
 
       # Identifier (variable name, etc.)
       [:identifier, word]
+    end
+
+    def match_prefixed_token(word, token_map)
+      token_map.keys.sort_by { |k| -k.length }.each do |keyword|
+        next unless word.start_with?(keyword)
+
+        rewind_excess(word.length - keyword.length)
+        return token_map[keyword]
+      end
+
+      nil
+    end
+
+    def match_reserved_prefix_before_syntax(word)
+      RESERVED_KEYWORD_GROUPS.each do |keyword_map, token_type|
+        keyword_map.keys.sort_by { |k| -k.length }.each do |keyword|
+          next unless word.start_with?(keyword)
+
+          rest = word[keyword.length..]
+          next if rest.nil? || rest.empty?
+          next unless syntax_delimiter_prefix?(rest)
+
+          rewind_excess(word.length - keyword.length)
+          value = keyword_map[keyword]
+          value = keyword if token_type == :other_keyword && value.empty?
+          return [token_type, value]
+        end
+      end
+
+      nil
+    end
+
+    def syntax_delimiter_prefix?(word)
+      SYNTAX_KEYWORDS.keys.any? { |keyword| word.start_with?(keyword) } ||
+        word.start_with?(STRING_LITERAL_OPEN) ||
+        word.start_with?(CHAR_LITERAL_OPEN)
+    end
+
+    def rewind_excess(excess)
+      return if excess <= 0
+
+      @pos -= excess
+      @column -= excess
     end
 
     def try_parse_number(word)

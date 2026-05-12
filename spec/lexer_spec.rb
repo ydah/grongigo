@@ -27,6 +27,30 @@ RSpec.describe Grongigo::Lexer do
         expect(tokens[2].value).to eq('while')
       end
 
+      it 'tokenizes built-in keywords correctly' do
+        lexer = described_class.new('ジョウジ ジョリドシ グンモウ')
+        tokens = lexer.tokenize
+
+        expect(tokens[0].type).to eq(:builtin_keyword)
+        expect(tokens[0].value).to eq('printf')
+        expect(tokens[1].type).to eq(:builtin_keyword)
+        expect(tokens[1].value).to eq('scanf')
+        expect(tokens[2].type).to eq(:builtin_keyword)
+        expect(tokens[2].value).to eq('sizeof')
+      end
+
+      it 'tokenizes literal keywords correctly' do
+        lexer = described_class.new('ギン ビゲ ルヂ')
+        tokens = lexer.tokenize
+
+        expect(tokens[0].type).to eq(:literal_keyword)
+        expect(tokens[0].value).to eq('1')
+        expect(tokens[1].type).to eq(:literal_keyword)
+        expect(tokens[1].value).to eq('0')
+        expect(tokens[2].type).to eq(:literal_keyword)
+        expect(tokens[2].value).to eq('NULL')
+      end
+
       it 'tokenizes other keywords correctly' do
         lexer = described_class.new('ゴロ パザ')
         tokens = lexer.tokenize
@@ -89,6 +113,16 @@ RSpec.describe Grongigo::Lexer do
         expect(tokens[2].value).to eq('!')
       end
 
+      it 'tokenizes bitwise operators' do
+        lexer = described_class.new('ガンド ゴガ')
+        tokens = lexer.tokenize
+
+        expect(tokens[0].type).to eq(:operator)
+        expect(tokens[0].value).to eq('&')
+        expect(tokens[1].type).to eq(:operator)
+        expect(tokens[1].value).to eq('|')
+      end
+
       it 'tokenizes increment/decrement operators' do
         lexer = described_class.new('ダグダグ ジブジブ')
         tokens = lexer.tokenize
@@ -102,7 +136,7 @@ RSpec.describe Grongigo::Lexer do
 
     context 'with literals' do
       it 'tokenizes string literals' do
-        lexer = described_class.new('「ゾレソパ」')
+        lexer = described_class.new('ジサビロジセヅゾレソパドジロジセヅ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:string_literal)
@@ -110,7 +144,7 @@ RSpec.describe Grongigo::Lexer do
       end
 
       it 'tokenizes char literals' do
-        lexer = described_class.new('『ガ』')
+        lexer = described_class.new('ジサビジドロジガドジジドロジ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:char_literal)
@@ -180,7 +214,7 @@ RSpec.describe Grongigo::Lexer do
       end
 
       it 'tokenizes parentheses' do
-        lexer = described_class.new('ザジレジョヂザギ ゴパシジョヂザギ')
+        lexer = described_class.new('ジサビバッボ ドジバッボ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:open_paren)
@@ -189,8 +223,20 @@ RSpec.describe Grongigo::Lexer do
         expect(tokens[1].value).to eq(')')
       end
 
+      it 'splits syntax delimiters from adjacent keywords' do
+        lexer = described_class.new('ジョウジジサビバッボジサビロジセヅゼソドジロジセヅドジバッボ')
+        tokens = lexer.tokenize
+
+        expect(tokens[0].type).to eq(:builtin_keyword)
+        expect(tokens[0].value).to eq('printf')
+        expect(tokens[1].type).to eq(:open_paren)
+        expect(tokens[2].type).to eq(:string_literal)
+        expect(tokens[2].value).to eq('ゼソ')
+        expect(tokens[3].type).to eq(:close_paren)
+      end
+
       it 'tokenizes brackets' do
-        lexer = described_class.new('ザジレパギセヅ ゴパシザギセヅ')
+        lexer = described_class.new('ジサビバブバッボ ドジバブバッボ')
         tokens = lexer.tokenize
 
         expect(tokens[0].type).to eq(:open_bracket)

@@ -145,8 +145,8 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates for loop' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            ブシバゲギ ザジレジョヂザギゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ ゴパシジョヂザギ ザジレ
-              printf ザジレジョヂザギ「test」ゴパシジョヂザギ
+            ブシバゲギ ジサビバッボゲギグウ i ギセス ゼゼソ、i ギョウバシ バギン、i ダグダグ ドジバッボ ザジレ
+              printf ジサビバッボジサビロジセヅtestドジロジセヅドジバッボ
             ゴパシ
           ゴパシ
         GRONGIGO
@@ -202,7 +202,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates function call expressions' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            printf ザジレジョヂザギ「Hello」、x ゴパシジョヂザギ
+            printf ジサビバッボジサビロジセヅHelloドジロジセヅ、x ドジバッボ
           ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -215,7 +215,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates array access expressions' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            ゲギグウ x ギセス arr ザジレパギセヅ ゼゼソ ゴパシザギセヅ
+            ゲギグウ x ギセス arr ジサビバブバッボ ゼゼソ ドジバブバッボ
           ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -250,6 +250,19 @@ RSpec.describe Grongigo::CodeGenerator do
 
         expect(c_code).to include('int result = (x && y);')
       end
+
+      it 'generates bitwise expressions' do
+        source = <<~GRONGIGO
+          パザ バサ test バサ ザジレ
+            ゲギグウ result ギセス x ガンド y ゴガ z
+          ゴパシ
+        GRONGIGO
+        ast = parse(source)
+        generator = described_class.new
+        c_code = generator.generate(ast)
+
+        expect(c_code).to include('int result = ((x & y) | z);')
+      end
     end
 
     context 'with literals' do
@@ -269,7 +282,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates string literals' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            printf ザジレジョヂザギ「Hello, World!」ゴパシジョヂザギ
+            printf ジサビバッボジサビロジセヅHello, World!ドジロジセヅドジバッボ
           ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -282,8 +295,8 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'escapes special characters in strings' do
         source = <<~GRONGIGO
                     パザ バサ test バサ ザジレ
-                      printf ザジレジョヂザギ「Line1
-          Line2」ゴパシジョヂザギ
+                      printf ジサビバッボジサビロジセヅLine1
+          Line2ドジロジセヅドジバッボ
                     ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -296,7 +309,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'generates char literals' do
         source = <<~GRONGIGO
           パザ バサ test バサ ザジレ
-            ロジ c ギセス 『a』
+            ロジ c ギセス ジサビジドロジaドジジドロジ
           ゴパシ
         GRONGIGO
         ast = parse(source)
@@ -304,6 +317,23 @@ RSpec.describe Grongigo::CodeGenerator do
         c_code = generator.generate(ast)
 
         expect(c_code).to include("char c = 'a';")
+      end
+
+      it 'generates literal keywords' do
+        source = <<~GRONGIGO
+          パザ バサ test バサ ザジレ
+            ゲギグウ enabled ギセス ギン
+            ゲギグウ disabled ギセス ビゲ
+            ロジ ptr ギセス ルヂ
+          ゴパシ
+        GRONGIGO
+        ast = parse(source)
+        generator = described_class.new
+        c_code = generator.generate(ast)
+
+        expect(c_code).to include('int enabled = 1;')
+        expect(c_code).to include('int disabled = 0;')
+        expect(c_code).to include('char ptr = NULL;')
       end
     end
 
@@ -338,7 +368,7 @@ RSpec.describe Grongigo::CodeGenerator do
       it 'preserves standard C function names' do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
-            printf ザジレジョヂザギ「test」ゴパシジョヂザギ
+            printf ジサビバッボジサビロジセヅtestドジロジセヅドジバッボ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -359,8 +389,8 @@ RSpec.describe Grongigo::CodeGenerator do
           ゴパシ
 
           パザ ゲギグウ ゴロ バサ ザジレ
-            ゲギグウ result ギセス add ザジレジョヂザギグシギ、ズゴゴ ゴパシジョヂザギ
-            printf ザジレジョヂザギ「Result: %d」、result ゴパシジョヂザギ
+            ゲギグウ result ギセス add ジサビバッボグシギ、ズゴゴ ドジバッボ
+            printf ジサビバッボジサビロジセヅResult: %dドジロジセヅ、result ドジバッボ
             ロゾス ゼゼソ
           ゴパシ
         GRONGIGO
@@ -379,7 +409,7 @@ RSpec.describe Grongigo::CodeGenerator do
         source = <<~GRONGIGO
           パザ ゲギグウ ゴロ バサ ザジレ
             ジョウベン パパン ザジレ
-              printf ザジレジョヂザギ「nested」ゴパシジョヂザギ
+              printf ジサビバッボジサビロジセヅnestedドジロジセヅドジバッボ
             ゴパシ
             ロゾス ゼゼソ
           ゴパシ
@@ -411,7 +441,7 @@ RSpec.describe Grongigo::CodeGenerator do
           パザ バサ test バサ ザジレ
             ザジレ
               ザジレ
-                printf ザジレジョヂザギ「deep」ゴパシジョヂザギ
+                printf ジサビバッボジサビロジセヅdeepドジロジセヅドジバッボ
               ゴパシ
             ゴパシ
           ゴパシ

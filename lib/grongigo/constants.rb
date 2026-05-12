@@ -44,19 +44,27 @@ module Grongigo
     'ヅヅゲス' => 'continue',   # continue (tsuzukeru)
     'ゲンダブ' => 'switch',     # switch (sentaku)
     'ダガギ' => 'case',         # case (baai)
-    'ビデギ' => 'default',      # default (kitei)
+    'ビデギ' => 'default'       # default (kitei)
+  }.freeze
+
+  # Keywords (built-in functions and special operators)
+  BUILTIN_KEYWORDS = {
     'ジョウジ' => 'printf',     # printf (hyouji)
-    'ジュウソブ' => 'scanf'     # scanf (juuryoku -> juusobu)
+    'ジョリドシ' => 'scanf',    # scanf (yomitori)
+    'グンモウ' => 'sizeof'      # sizeof (sunpou)
+  }.freeze
+
+  # Keywords (literal values)
+  LITERAL_KEYWORDS = {
+    'ギン' => '1',              # true (shin)
+    'ビゲ' => '0',              # false (nise)
+    'ルヂ' => 'NULL'            # NULL (muchi)
   }.freeze
 
   # Keywords (other)
   OTHER_KEYWORDS = {
     'ボウゾウ' => 'struct',     # struct (kouzou)
     'バダデギギ' => 'typedef',  # typedef (katatеigi)
-    'ゴゴビガ' => 'sizeof',     # sizeof (ookisa)
-    'ル' => 'NULL',             # NULL (mu)
-    'ギン' => '1',              # true (shin)
-    'ギ' => '0',                # false (gi) - need to distinguish from variable names
     'ゴロ' => 'main',           # main (omo)
     'パザ' => '',               # function definition marker (waza)
     'ザジレ' => '{',            # block start (hajime)
@@ -81,7 +89,7 @@ module Grongigo
     'ラダパ' => '||',           # or (mataha)
     'ジデギ' => '!',            # not (hitei)
     'ガンド' => '&',            # bitwise and (ando)
-    'ゴゴ' => '|',              # bitwise or (oa -> goga)
+    'ゴガ' => '|',              # bitwise or (oa)
     'ダグダグ' => '++',         # increment (tasu tasu)
     'ジブジブ' => '--'          # decrement (hiku hiku)
   }.freeze
@@ -89,6 +97,8 @@ module Grongigo
   # Merge all keywords
   ALL_KEYWORDS = TYPE_KEYWORDS
                  .merge(CONTROL_KEYWORDS)
+                 .merge(BUILTIN_KEYWORDS)
+                 .merge(LITERAL_KEYWORDS)
                  .merge(OTHER_KEYWORDS)
                  .freeze
 

@@ -48,7 +48,11 @@ Special rules:
 | ゲギグウ | int | 整数 (seisuu - integer) |
 | ロジ | char | 文字 (moji - character) |
 | ズゾウ | float | 浮動 (fudou - floating) |
+| ザダダス | double | 不浮動 (fukufudou - double) |
 | バサ | void | 空 (kara - empty) |
+| バゴ | long | 長 (naga - long) |
+| ジジバギ | short | 短い (mijikai - short) |
+| ブゾウ | unsigned | 無符号 (mufugou - unsigned) |
 
 ### Control Structures
 
@@ -64,6 +68,22 @@ Special rules:
 | ゲンダブ | switch | 選択 (sentaku - selection) |
 | ダガギ | case | 場合 (baai - case) |
 | ビデギ | default | 既定 (kitei - default) |
+
+### Built-in Keywords
+
+| Grongigo | C | Japanese Origin |
+|----------|---|----------------|
+| ジョウジ | printf | 表示 (hyouji - display) |
+| ジョリドシ | scanf | 読み取り (yomitori - read) |
+| グンモウ | sizeof | 寸法 (sunpou - dimensions) |
+
+### Literal Keywords
+
+| Grongigo | C | Japanese Origin |
+|----------|---|----------------|
+| ギン | 1 | 真 (shin - true) |
+| ビゲ | 0 | 偽 / にせ (nise - false) |
+| ルヂ | NULL | 無値 (muchi - null value) |
 
 ### Operators
 
@@ -84,6 +104,10 @@ Special rules:
 | バヅ | && | かつ (katsu - and) |
 | ラダパ | \|\| | または (mataha - or) |
 | ジデギ | ! | 否定 (hitei - negation) |
+| ガンド | & | アンド (and - bitwise and) |
+| ゴガ | \| | オア (or - bitwise or) |
+| ダグダグ | ++ | 足す足す (tasu tasu - increment) |
+| ジブジブ | -- | 引く引く (hiku hiku - decrement) |
 
 ### Numbers (Base-9)
 
@@ -108,19 +132,22 @@ Compound number representation:
 
 ### Syntax Elements
 
-| Grongigo | Meaning |
-|----------|---------|
-| ザジレ ... ゴパシ | Block { ... } |
-| パザ | Function definition marker |
-| ゴロ | main function name |
-| ジョウジ | printf |
-| 「...」 | String literal |
-| 『...』 | Character literal |
-| （ ） | Parentheses |
-| 、 | Comma |
-| 。 | Semicolon (optional) |
-| ゴゴ ... | Line comment |
-| ゴビ ... ビゴ | Block comment |
+| Grongigo | Meaning | Japanese Origin |
+|----------|---------|-----------------|
+| ザジレ ... ゴパシ | Block `{ ... }` | 始め / 終わり |
+| パザ | Function definition marker | 技 |
+| ゴロ | main function name | 主 |
+| ジョウジ | printf | 表示 |
+| ジョリドシ | scanf | 読み取り |
+| グンモウ | sizeof | 寸法 |
+| ジサビロジセヅ ... ドジロジセヅ | String literal | 開き文字列 / 閉じ文字列 |
+| ジサビジドロジ ... ドジジドロジ | Character literal | 開き一文字 / 閉じ一文字 |
+| ジサビバッボ ... ドジバッボ | Parentheses | 開き括弧 / 閉じ括弧 |
+| ジサビバブバッボ ... ドジバブバッボ | Brackets | 開き角括弧 / 閉じ角括弧 |
+| 、 | Comma | 読点 |
+| 。 | Semicolon (optional) | 句点 |
+| ゴゴ ... | Line comment | comment |
+| ゴビ ... ビゴ | Block comment | comment |
 
 ## Usage
 
@@ -176,7 +203,7 @@ bin/grongigo -n 100
 ```
 パザ ゲギグウ ゴロ バサ
 ザジレ
-    ジョウジ（「リントンボドバゼ\n」）
+    ジョウジ ジサビバッボジサビロジセヅリントンボドバゼ\nドジロジセヅドジバッボ
     ロゾス ゼゼソ
 ゴパシ
 ```
@@ -192,19 +219,19 @@ bin/grongigo -n 100
     ザジレ
         ジョウベン ギ ガラシ バギンドギブグ ジドギギ ゼゼソ
         ザジレ
-            ジョウジ（「FizzBuzz\n」）
+            ジョウジ ジサビバッボジサビロジセヅFizzBuzz\nドジロジセヅドジバッボ
         ゴパシ
         ゾバ ジョウベン ギ ガラシ グシギ ジドギギ ゼゼソ
         ザジレ
-            ジョウジ（「Fizz\n」）
+            ジョウジ ジサビバッボジサビロジセヅFizz\nドジロジセヅドジバッボ
         ゴパシ
         ゾバ ジョウベン ギ ガラシ ズガギ ジドギギ ゼゼソ
         ザジレ
-            ジョウジ（「Buzz\n」）
+            ジョウジ ジサビバッボジサビロジセヅBuzz\nドジロジセヅドジバッボ
         ゴパシ
         ゾバ
         ザジレ
-            ジョウジ（「%d\n」、 ギ）
+            ジョウジ ジサビバッボジサビロジセヅ%d\nドジロジセヅ、 ギ ドジバッボ
         ゴパシ
 
         ギ ギセス ギ ダグ パパン

@@ -85,7 +85,7 @@ if ARGV.empty?
 
     パザ ゲギグウ ゴロ バサ
     ザジレ
-        ジョウジ ザジレジョヂザギ「リントンボドバ」ゴパシジョヂザギ
+        ジョウジ ジサビバッボジサビロジセヅリントンボドバドジロジセヅドジバッボ
         ロゾス ゼゼソ
     ゴパシ
 
@@ -93,17 +93,22 @@ if ARGV.empty?
 
     Types:
       ゲギグウ (int)    ロジ (char)    ズゾウ (float)    バサ (void)
+      バゴ (long)       ジジバギ (short) ブゾウ (unsigned)
 
     Control:
       ジョウベン (if)   ゾバ (else)    ガギザ (while)   ブシバゲギ (for)
       ロゾス (return)   ブゲス (break) ヅヅゲス (continue)
       ゲンダブ (switch) ダガギ (case)  ビデギ (default)
 
+    Built-ins and literals:
+      ジョウジ (printf) ジョリドシ (scanf) グンモウ (sizeof)
+      ギン (true)       ビゲ (false)       ルヂ (NULL)
+
     Operators:
       ダグ (+)   ジブ (-)   バゲス (*)   パス (/)    ガラシ (%)
       ギセス (=) ジドギギ (==) ジドギグバギ (!=)
       ギョウバシ (<)  ザギバシ (>)  ギバ (<=)  ギジョウ (>=)
-      バヅ (&&)  ラダパ (||)  ジデギ (!)
+      バヅ (&&)  ラダパ (||)  ジデギ (!)  ガンド (&)  ゴガ (|)
 
     Numbers (base-9):
       ゼゼソ (0)   パパン (1)   ドググ (2)   グシギ (3)
@@ -116,12 +121,14 @@ if ARGV.empty?
     Syntax:
       ザジレ ... ゴパシ                      ({ ... })
       パザ                                   (function definition marker)
-      「文字列」                             (string literal)
-      『文字』                               (character literal)
-      ザジレジョヂザギ ... ゴパシジョヂザギ  (method call brackets)
-      ザジレパギセヅ ... ゴパシザギセヅ      (array access brackets)
+      ジサビロジセヅ文字列ドジロジセヅ       (string literal)
+      ジサビジドロジ文字ドジジドロジ         (character literal)
+      ジサビバッボ ... ドジバッボ            (method call brackets)
+      ジサビバブバッボ ... ドジバブバッボ      (array access brackets)
       、                                     (comma)
       。                                     (semicolon)
+      ゴゴ ...                               (line comment)
+      ゴビ ... ビゴ                          (block comment)
 
   SAMPLE
   exit

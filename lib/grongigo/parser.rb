@@ -433,9 +433,33 @@ module Grongigo
     end
 
     def parse_and
-      expr = parse_equality
+      expr = parse_bitwise_or
 
       while check(:operator) && current.value == '&&'
+        op = advance.value
+        right = parse_bitwise_or
+        expr = AST::BinaryExpr.new(expr, op, right, expr.line, expr.column)
+      end
+
+      expr
+    end
+
+    def parse_bitwise_or
+      expr = parse_bitwise_and
+
+      while check(:operator) && current.value == '|'
+        op = advance.value
+        right = parse_bitwise_and
+        expr = AST::BinaryExpr.new(expr, op, right, expr.line, expr.column)
+      end
+
+      expr
+    end
+
+    def parse_bitwise_and
+      expr = parse_equality
+
+      while check(:operator) && current.value == '&'
         op = advance.value
         right = parse_equality
         expr = AST::BinaryExpr.new(expr, op, right, expr.line, expr.column)
@@ -555,7 +579,18 @@ module Grongigo
       # Keyword used as identifier
       return AST::Identifier.new(previous.value, line, column) if match(:other_keyword)
 
-      # Control keyword (function name like printf)
+      # Literal keywords
+      if match(:literal_keyword)
+        value = previous.value
+        return AST::NumberLiteral.new(value.to_i, line, column) if value.match?(/\A\d+\z/)
+
+        return AST::Identifier.new(value, line, column)
+      end
+
+      # Built-in keywords
+      return AST::Identifier.new(previous.value, line, column) if match(:builtin_keyword)
+
+      # Control keyword
       return AST::Identifier.new(previous.value, line, column) if match(:control_keyword)
 
       # Parentheses
