@@ -193,7 +193,7 @@ bin/grongigo -c "こんにちは"
 
 # Convert number to base-9 Grongigo
 bin/grongigo -n 100
-# Output: 100 (decimal) = バギングバギンドバギングパパンドパパン (Grongigo)
+# Output: 100 (decimal) = バギングバギンドバギングドググドパパン (Grongigo)
 ```
 
 ## Sample Programs
